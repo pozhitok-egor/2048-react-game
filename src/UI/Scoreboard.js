@@ -1,15 +1,16 @@
 import React, {Component} from 'react'
 import styled from 'styled-components';
-
+import Authorisation from './Authorisation';
 class Scoreboard extends Component {
   render() {
-    const {score, bestScore} = this.props;
+    const {signin, signup, signout, userdata, score, bestScore} = this.props;
     let additionalScore;
     if (this.props.additionalScore) {
       additionalScore = <AdditionalScore>+{this.props.additionalScore}</AdditionalScore>
     }
     return (
       <ScoreBlock>
+        <Authorisation signOutHandler={signout} signInHandler={signin} signUpHandler={signup} userdata={userdata}/>
         <Window>
           {additionalScore}
           <Title>Score</Title>

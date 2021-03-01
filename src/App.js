@@ -1,7 +1,7 @@
 import { checkGameOver, isChanged, initCells, moveCells, directions, removeAndIncreaseCells, populateField } from './Controller/Control';
 import {ModalIcon, ModalTitle, ModalDescription, ModalInput, ModalButton} from './UI/ModalWindow';
 import React, { Component } from 'react'
-import {BrowserRouter, Switch} from "react-router-dom";
+import {BrowserRouter, Route, Switch} from "react-router-dom";
 import styled from 'styled-components';
 import Menu from './UI/Menu/Menu.js';
 import Game from './UI/Game.js';
@@ -13,6 +13,8 @@ import mainTheme from './assets/audio/main theme chill.mp3';
 import moveSound from './assets/audio/move.wav';
 import ReactModal from 'react-modal';
 import cryptojs from 'crypto-js';
+import Callback from './UI/Callback';
+import axios from 'axios';
 
 var keyPressAllow = true;
 const secret = 'secret';
@@ -21,10 +23,17 @@ class App extends Component {
   constructor(props) {
     super(props);
     const state = this.getAllData();
+
     this.state = state ? state : {
       cells: initCells(4),
       score: 0,
       size: 4,
+      user: null,
+      leaderboard: {
+        easy: [],
+        medium: [],
+        hard: [],
+      },
       bestScore: Number(localStorage.getItem('bestScore')) || 0,
       colors: localStorage.getItem('colors') ? localStorage.getItem('colors') === 'true' : true,
       nightmode: localStorage.getItem('nightmode') ? localStorage.getItem('nightmode') === 'true' : false,
@@ -33,26 +42,61 @@ class App extends Component {
       musicVolume: Number(localStorage.getItem('soundVolume')) || 1,
       soundVolume: Number(localStorage.getItem('soundVolume')) || 1
     };
+
     this.saveAllData = this.saveAllData.bind(this);
     this.buttonHandler = this.buttonHandler.bind(this);
     this.musicVolumeHandler = this.musicVolumeHandler.bind(this);
     this.soundVolumeHandler = this.soundVolumeHandler.bind(this);
+    this.signOutHandler = this.signOutHandler.bind(this);
+    this.signInHandler = this.signInHandler.bind(this);
+    this.signUpHandler = this.signUpHandler.bind(this);
     this.mainTheme = new Audio(mainTheme);
     this.mainTheme.loop = true;
+
     if (this.state.music) {
       this.mainTheme.play();
     }
     this.moveSound = new Audio(moveSound);
   }
 
+  signOutHandler(e) {
+    // TODO: signOutHandler
+    console.log(`signOutHandler ${e}`);
+  }
+
+  signInHandler(e) {
+    // TODO: signInHandler
+    console.log(`signInHandler ${e}`);
+  }
+
+  signUpHandler(e) {
+    // TODO: signUpHandler
+    console.log(`signUpHandler ${e}`);
+  }
+
+
   getAllData() {
-    const bestScore = localStorage.getItem("bestScore") ? localStorage.getItem("bestScore") === "true" : 0;
+    const token = localStorage.getItem('token') || null;
+    if (token) {
+      axios.get('https://twenty-forty-eight.herokuapp.com/user',{
+      headers: {
+        authorization: `Bearer ${token}`,
+        accept: 'application/json'
+      }
+      }).then((res) => {
+        this.setState({user: res.data.user});
+      }).catch((err) => {
+        console.error(err);
+      })
+    }
+    const bestScore = localStorage.getItem("bestScore") ||  0;
     const colors = localStorage.getItem("colors") ? localStorage.getItem("colors") === "true" : true;
     const nightmode = localStorage.getItem("nightmode") ? localStorage.getItem("nightmode") === "true" : false;
     const music = localStorage.getItem("music") ? localStorage.getItem("music") === "true" : true;
     const sound = localStorage.getItem("sound") ? localStorage.getItem("sound") === "true" : true;
-    const musicVolume = localStorage.getItem("musicVolume") ? localStorage.getItem("musicVolume") === "true" : .5;
-    const soundVolume = localStorage.getItem("soundVolume") ? localStorage.getItem("soundVolume") === "true" : .5;
+    const musicVolume = localStorage.getItem("musicVolume") || .5;
+    const soundVolume = localStorage.getItem("soundVolume") || .5;
+
     const mainSettings = localStorage.getItem("s") ? JSON.parse(cryptojs.AES.decrypt(localStorage.getItem("s"), secret).toString(cryptojs.enc.Utf8))
     : {
       cells: initCells(4),
@@ -253,22 +297,24 @@ class App extends Component {
     const colors = !this.state.colors ? 'ON' : 'OFF';
     return (
       <Main nightmode={this.state.nightmode}>
-        <ReactModal isOpen={false} style={ModalStyles}>
-          <ModalIcon></ModalIcon>
-          <ModalTitle></ModalTitle>
-          <ModalDescription></ModalDescription>
-          <ModalInput></ModalInput>
-          <ModalButton>Ok</ModalButton>
-        </ReactModal>
-        <Layout>
-          <BrowserRouter>
+        <BrowserRouter>
+        <a href="https://github.com/login/oauth/authorize?client_id=70e40fe40ada41351efa">Sign in GitHub</a>
+        <Route path='/callback' component={Callback}/>
+          <ReactModal isOpen={false} style={ModalStyles}>
+            <ModalIcon></ModalIcon>
+            <ModalTitle></ModalTitle>
+            <ModalDescription></ModalDescription>
+            <ModalInput></ModalInput>
+            <ModalButton>Ok</ModalButton>
+          </ReactModal>
+          <Layout>
             <Switch>
               <Menu nightmode={nightmode} musicHandler={this.musicVolumeHandler} soundHandler={this.soundVolumeHandler} colors={colors} music={music} sound={sound} difficulty={difficulty} buttonHandler={this.buttonHandler}/>
             </Switch>
-          </BrowserRouter>
-          <Game nightmode={nightmode} colors={colors} additionalScore={additionalScore} score={score} bestScore={bestScore} cells={this.state.cells} size={size}/>
-          <Leaderboard />
-        </Layout>
+            <Game signin={this.signOutHandler} signout={this.signInHandler} signup={this.signUpHandler} userdata={this.state.user} nightmode={nightmode} colors={colors} additionalScore={additionalScore} score={score} bestScore={bestScore} cells={this.state.cells} size={size}/>
+            <Leaderboard />
+          </Layout>
+        </BrowserRouter>
       </Main>
     )
   };

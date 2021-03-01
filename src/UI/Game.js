@@ -5,8 +5,7 @@ import Footer from './Footer';
 
 class Game extends Component {
   render() {
-    const {nightmode, colors, additionalScore, bestScore, score, cells, size} = this.props
-
+    const {signout, signin, signup, userdata, nightmode, colors, additionalScore, bestScore, score, cells, size} = this.props;
     let cellGrid = [];
 
     for (let i = 0; i < size**2; i++) {
@@ -14,7 +13,7 @@ class Game extends Component {
     }
     return (
       <MainBlock>
-        <Scoreboard additionalScore={additionalScore} score={score} bestScore={bestScore}/>
+        <Scoreboard signout={signout} signin={signin} signup={signup} userdata={userdata} additionalScore={additionalScore} score={score} bestScore={bestScore}/>
         <Field size={size}>
           {
             cells.map((value) =>
