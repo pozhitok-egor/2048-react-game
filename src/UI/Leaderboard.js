@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components';
 
 const Scores = [
@@ -9,19 +9,20 @@ const Scores = [
   ["Max", 60]
 ]
 
-export default function Menu() {
+export default function Menu({leaderboard}) {
+  const [type, settype] = useState("easy");
   return (
     <RightBlock>
       <TitleBlock>
         <Title>LEADERBOARD</Title>
         <Buttons>
-          <Button>
+          <Button onClick={(e) => settype("easy")}>
             Easy
           </Button>
-          <Button>
+          <Button onClick={(e) => settype("medium")}>
             Normal
           </Button>
-          <Button>
+          <Button onClick={(e) => settype("hard")}>
             Hard
           </Button>
         </Buttons>
@@ -38,17 +39,17 @@ export default function Menu() {
             Score
           </Score>
         </Row>
-        {
-          Scores.map ((elem, index) =>
+        { leaderboard && leaderboard[type] &&
+          leaderboard[type].map((elem, index) =>
             <Row key={index}>
               <Number>
                 # {index+1}
               </Number>
               <Name>
-                {elem[0]}
+                {elem.name}
               </Name>
               <Score>
-                {elem[1]}
+                {elem.score}
               </Score>
             </Row>
           )

@@ -1,5 +1,4 @@
 import React from 'react'
-import { Redirect } from 'react-router-dom';
 import axios from 'axios';
 
 const Callback = (props) => {
@@ -27,9 +26,11 @@ const Callback = (props) => {
       }
     }).then((res) => {
       localStorage.setItem('token', res.data.token);
+      window.document.location = '/';
     }).catch((err) => console.log(err.message))
   })
-  return <Redirect to="/"/>
+
+  return <div></div>
 }
 
 export default Callback;

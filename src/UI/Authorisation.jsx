@@ -18,13 +18,14 @@ const Auth = styled.div`
 `;
 
 const Name = styled.p`
-  margin: 0 10px 0;
+  margin: 0;
 `;
 
 const Button = styled.button`
   outline: none;
   cursor: pointer;
   padding: 5px 10px;
+  margin-left: 10px;
   border: 1px solid #7D7171;
   border-radius: 10px;
   font-family: 'Lato',sans-serif;

@@ -1,5 +1,4 @@
 import { checkGameOver, isChanged, initCells, moveCells, directions, removeAndIncreaseCells, populateField } from './Controller/Control';
-import {ModalIcon, ModalTitle, ModalDescription, ModalInput, ModalButton} from './UI/ModalWindow';
 import React, { Component } from 'react'
 import {BrowserRouter, Route, Switch} from "react-router-dom";
 import styled from 'styled-components';
@@ -11,7 +10,6 @@ import backgroundLight from './assets/images/bg-light.png';
 import backgroundDark from './assets/images/bg-night.png';
 import mainTheme from './assets/audio/main theme chill.mp3';
 import moveSound from './assets/audio/move.wav';
-import ReactModal from 'react-modal';
 import cryptojs from 'crypto-js';
 import Callback from './UI/Callback';
 import axios from 'axios';
@@ -47,9 +45,7 @@ class App extends Component {
     this.buttonHandler = this.buttonHandler.bind(this);
     this.musicVolumeHandler = this.musicVolumeHandler.bind(this);
     this.soundVolumeHandler = this.soundVolumeHandler.bind(this);
-    this.signOutHandler = this.signOutHandler.bind(this);
-    this.signInHandler = this.signInHandler.bind(this);
-    this.signUpHandler = this.signUpHandler.bind(this);
+    this.userHandler = this.userHandler.bind(this);
     this.mainTheme = new Audio(mainTheme);
     this.mainTheme.loop = true;
 
@@ -59,19 +55,22 @@ class App extends Component {
     this.moveSound = new Audio(moveSound);
   }
 
-  signOutHandler(e) {
-    // TODO: signOutHandler
-    console.log(`signOutHandler ${e}`);
-  }
-
-  signInHandler(e) {
-    // TODO: signInHandler
-    console.log(`signInHandler ${e}`);
-  }
-
-  signUpHandler(e) {
-    // TODO: signUpHandler
-    console.log(`signUpHandler ${e}`);
+  userHandler() {
+    const token = localStorage.getItem('token') || null;
+    if (token) {
+      axios.get('https://twenty-forty-eight.herokuapp.com/user',{
+      headers: {
+        authorization: `Bearer ${token}`,
+        accept: 'application/json'
+      }
+      }).then((res) => {
+        this.setState({user: res.data.user});
+      }).catch((err) => {
+        console.error(err);
+      })
+    } else {
+      this.setState({user: null});
+    }
   }
 
 
@@ -88,7 +87,23 @@ class App extends Component {
       }).catch((err) => {
         console.error(err);
       })
+    } else {
+      this.setState({user: null});
     }
+    axios.get('https://twenty-forty-eight.herokuapp.com/score',{
+    headers: {
+      accept: 'application/json'
+    }
+    }).then((res) => {
+      const data = res.data.scores;
+      this.setState({leaderboard: {
+        easy: data.filter(scores => scores.type === "easy").sort((a, b) => a.score - b.score),
+        medium: data.filter(scores => scores.type === "medium").sort((a, b) => a.score - b.score),
+        hard: data.filter(scores => scores.type === "hard").sort((a, b) => a.score - b.score)
+      }});
+    }).catch((err) => {
+      console.error(err);
+    })
     const bestScore = localStorage.getItem("bestScore") ||  0;
     const colors = localStorage.getItem("colors") ? localStorage.getItem("colors") === "true" : true;
     const nightmode = localStorage.getItem("nightmode") ? localStorage.getItem("nightmode") === "true" : false;
@@ -288,6 +303,10 @@ class App extends Component {
     }
   }
 
+  modalHandler(param) {
+    keyPressAllow = param;
+  }
+
   render() {
     const { additionalScore, bestScore, score, size} = this.state;
     const difficulty = this.state.size ? this.state.size === 5 ? "easy" : this.state.size === 4 ? "normal" : "hard" : "normal";
@@ -298,21 +317,13 @@ class App extends Component {
     return (
       <Main nightmode={this.state.nightmode}>
         <BrowserRouter>
-        <a href="https://github.com/login/oauth/authorize?client_id=70e40fe40ada41351efa">Sign in GitHub</a>
-        <Route path='/callback' component={Callback}/>
-          <ReactModal isOpen={false} style={ModalStyles}>
-            <ModalIcon></ModalIcon>
-            <ModalTitle></ModalTitle>
-            <ModalDescription></ModalDescription>
-            <ModalInput></ModalInput>
-            <ModalButton>Ok</ModalButton>
-          </ReactModal>
+          <Route path='/callback' component={Callback}/>
           <Layout>
             <Switch>
               <Menu nightmode={nightmode} musicHandler={this.musicVolumeHandler} soundHandler={this.soundVolumeHandler} colors={colors} music={music} sound={sound} difficulty={difficulty} buttonHandler={this.buttonHandler}/>
             </Switch>
-            <Game signin={this.signOutHandler} signout={this.signInHandler} signup={this.signUpHandler} userdata={this.state.user} nightmode={nightmode} colors={colors} additionalScore={additionalScore} score={score} bestScore={bestScore} cells={this.state.cells} size={size}/>
-            <Leaderboard />
+            <Game modalHandler={this.modalHandler} userHandler={this.userHandler} userdata={this.state.user} nightmode={nightmode} colors={colors} additionalScore={additionalScore} score={score} bestScore={bestScore} cells={this.state.cells} size={size}/>
+            <Leaderboard leaderboard={this.state.leaderboard}/>
           </Layout>
         </BrowserRouter>
       </Main>
@@ -424,11 +435,3 @@ const Main = styled.div`
 const Layout = styled.div`
   display: flex;
 `
-
-const ModalStyles = { overlay: {
-
-}, content: {
-  width: "40%",
-  height: "40%",
-  background: "red",
-} };

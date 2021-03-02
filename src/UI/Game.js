@@ -2,10 +2,183 @@ import React, { Component } from 'react'
 import styled from 'styled-components';
 import Scoreboard from './Scoreboard';
 import Footer from './Footer';
+import ModalWindow from './ModalWindow';
+import error from '../assets/images/error.png';
+import gameOver from '../assets/images/gameOver.png';
+import check from '../assets/images/check.png';
+import congrats from '../assets/images/congrats.png';
+import axios from 'axios';
 
 class Game extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      modal: false,
+      modaldata: {
+        type: 'error',
+        exit: true,
+        icon: error,
+        title: "Error",
+        description: "An error occurred",
+        inputId: "input",
+        error: null,
+        firstButton: {
+          text: "OK",
+          handler: null
+        },
+        secondButton: {
+          active: false,
+          text: "",
+          handler: null
+        },
+        submit: ''
+      }
+    }
+    this.signIn = this.signIn.bind(this);
+    this.signUp = this.signUp.bind(this);
+    this.signOut = this.signOut.bind(this);
+    this.modal = this.modal.bind(this);
+    this.register = this.register.bind(this);
+    this.login = this.login.bind(this);
+    this.exitModal = this.exitModal.bind(this);
+  }
+
+  componentDidMount() {
+    document.addEventListener('keypress', this.handleKeyPress)
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keypress', this.handleKeyPress)
+  }
+
+  exitModal() {
+    this.props.modalHandler(true);
+    this.setState({modal: false});
+  }
+
+  signOut() {
+    localStorage.removeItem('token');
+    this.props.userHandler();
+  }
+
+  signIn() {
+    this.modal(true, "login", {
+      exit: true,
+      firstButton: {
+        text: "Login",
+        handler: (e) => e.preventDefault()
+      },
+      secondButton: {
+        text: "Register",
+        handler: this.signUp,
+      },
+      submit: this.login
+    })
+  }
+
+  signUp() {
+    this.modal(true, "register", {
+      exit: true,
+      firstButton: {
+        text: "Register",
+        handler: (e) => e.preventDefault()
+      },
+      secondButton: {
+        text: "Login",
+        handler: this.signIn,
+      },
+      submit: this.register
+    })
+  }
+
+  register(event, data) {
+    console.log(event, data);
+    if (data.password !== data.confirm) {
+      this.setState((state) => state.modaldata.error = "Passwords don't match");
+    }
+    if (data.username.length < 4) {
+      this.setState((state) => state.modaldata.error = "Your username must be at least 4 characters");
+    }
+    if (data.username.search(/[a-z]/i) < 0) {
+        this.setState((state) => state.modaldata.error = "Your username must contain at least one letter.");
+    }
+
+    if (data.password.length < 6) {
+        this.setState((state) => state.modaldata.error = "Your password must be at least 8 characters");
+    }
+    if (data.password.search(/[a-z]/i) < 0) {
+        this.setState((state) => state.modaldata.error = "Your password must contain at least one letter.");
+    }
+    if (data.password.search(/[0-9]/) < 0) {
+        this.setState((state) => state.modaldata.error = "Your password must contain at least one digit.");
+    }
+    axios.post('https://twenty-forty-eight.herokuapp.com/user/register',
+    {
+      username: data.username,
+      password: data.password
+    } ,
+    {
+      method: 'post',
+      headers: {
+        accept: 'application/json'
+      }
+    }).then((res) => {
+      this.exitModal();
+      localStorage.setItem('token', res.data.token);
+      this.props.userHandler();
+    }).catch((err) => this.setState((state) => state.modaldata.error = err.message))
+    event.preventDefault();
+  }
+
+  login(event, data) {
+    console.log(event, data);
+    axios.post('https://twenty-forty-eight.herokuapp.com/user/login',
+    {
+      username: data.username,
+      password: data.password
+    } ,
+    {
+      method: 'post',
+      headers: {
+        accept: 'application/json'
+      }
+    }).then((res) => {
+      this.exitModal();
+      localStorage.setItem('token', res.data.token);
+      this.props.userHandler();
+    }).catch((err) => this.setState((state) => state.modaldata.error = err.message))
+    event.preventDefault();
+  }
+
+  modal(modal, type, data) {
+    this.props.modalHandler(false);
+    const {icon, title, description, inputId, firstButton, secondButton, submit, error, exit} = data
+
+    this.setState({
+      modal,
+      modaldata: {
+        type,
+        exit: exit || false,
+        icon: icon || null,
+        title: title || null,
+        description: description || null,
+        inputId: inputId || 0,
+        error: error || null,
+        firstButton: {
+          text: firstButton.text || "OK",
+          handler: firstButton.handler || null
+        },
+        secondButton: {
+          text: secondButton.text || null,
+          handler: secondButton.handler || null
+        },
+        submit: submit || ""
+      }
+    })
+  }
+
   render() {
-    const {signout, signin, signup, userdata, nightmode, colors, additionalScore, bestScore, score, cells, size} = this.props;
+    const {userdata, nightmode, colors, additionalScore, bestScore, score, cells, size} = this.props;
     let cellGrid = [];
 
     for (let i = 0; i < size**2; i++) {
@@ -13,7 +186,8 @@ class Game extends Component {
     }
     return (
       <MainBlock>
-        <Scoreboard signout={signout} signin={signin} signup={signup} userdata={userdata} additionalScore={additionalScore} score={score} bestScore={bestScore}/>
+        {this.state.modal && <ModalWindow exitHandler={this.exitModal} modaldata={this.state.modaldata}/>}
+        <Scoreboard signout={this.signOut} signin={this.signIn} signup={this.signUp} userdata={userdata} additionalScore={additionalScore} score={score} bestScore={bestScore}/>
         <Field size={size}>
           {
             cells.map((value) =>
