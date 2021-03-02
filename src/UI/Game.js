@@ -4,34 +4,33 @@ import Scoreboard from './Scoreboard';
 import Footer from './Footer';
 import ModalWindow from './ModalWindow';
 import error from '../assets/images/error.png';
-import gameOver from '../assets/images/gameOver.png';
-import check from '../assets/images/check.png';
-import congrats from '../assets/images/congrats.png';
 import axios from 'axios';
 
 class Game extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      modal: false,
-      modaldata: {
-        type: 'error',
-        exit: true,
-        icon: error,
-        title: "Error",
-        description: "An error occurred",
-        inputId: "input",
-        error: null,
-        firstButton: {
-          text: "OK",
-          handler: null
-        },
-        secondButton: {
-          active: false,
-          text: "",
-          handler: null
-        },
-        submit: ''
+      modal: {
+        active: false,
+        data: {
+          type: 'error',
+          exit: true,
+          icon: error,
+          title: "Error",
+          description: "An error occurred",
+          inputId: "input",
+          error: null,
+          firstButton: {
+            text: "OK",
+            handler: null
+          },
+          secondButton: {
+            active: false,
+            text: "",
+            handler: null
+          },
+          submit: ''
+        }
       }
     }
     this.signIn = this.signIn.bind(this);
@@ -53,7 +52,7 @@ class Game extends Component {
 
   exitModal() {
     this.props.modalHandler(true);
-    this.setState({modal: false});
+    this.setState((state) => state.modal.active = false);
   }
 
   signOut() {
@@ -150,29 +149,31 @@ class Game extends Component {
     event.preventDefault();
   }
 
-  modal(modal, type, data) {
+  modal(active, type, data) {
     this.props.modalHandler(false);
     const {icon, title, description, inputId, firstButton, secondButton, submit, error, exit} = data
 
     this.setState({
-      modal,
-      modaldata: {
-        type,
-        exit: exit || false,
-        icon: icon || null,
-        title: title || null,
-        description: description || null,
-        inputId: inputId || 0,
-        error: error || null,
-        firstButton: {
-          text: firstButton.text || "OK",
-          handler: firstButton.handler || null
-        },
-        secondButton: {
-          text: secondButton.text || null,
-          handler: secondButton.handler || null
-        },
-        submit: submit || ""
+      modal: {
+        active,
+        data: {
+          type,
+          exit: exit || false,
+          icon: icon || null,
+          title: title || null,
+          description: description || null,
+          inputId: inputId || 0,
+          error: error || null,
+          firstButton: {
+            text: firstButton.text || "OK",
+            handler: firstButton.handler || null
+          },
+          secondButton: {
+            text: secondButton.text || null,
+            handler: secondButton.handler || null
+          },
+          submit: submit || ""
+        }
       }
     })
   }
@@ -186,7 +187,7 @@ class Game extends Component {
     }
     return (
       <MainBlock>
-        {this.state.modal && <ModalWindow exitHandler={this.exitModal} modaldata={this.state.modaldata}/>}
+        {this.state.modal.active && <ModalWindow exitHandler={this.exitModal} modaldata={this.state.modal.data}/>}
         <Scoreboard signout={this.signOut} signin={this.signIn} signup={this.signUp} userdata={userdata} additionalScore={additionalScore} score={score} bestScore={bestScore}/>
         <Field size={size}>
           {
