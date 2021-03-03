@@ -18,11 +18,14 @@ background-color: green;
 `;
 const Leaderboard = styled.div`
 background-color: red;
+  @media (max-width: 940px) {
+    margin: 20px 0;
+  }
 `;
 
 class Layout extends Component {
   render() {
-    const { menu, scoreboard, game, leaderboard} = this.props
+    const { menu, game, leaderboard } = this.props
     console.log(menu)
     return (
       <Main>

@@ -43,6 +43,10 @@ const LeftBlock = styled.div`
   display: flex;
   flex-direction: column;
   gap: 40px;
+  @media (max-width: 940px) {
+    margin: 0 0 20px;
+    width: 100%;
+  }
 `;
 
 const GameTitle = styled.div`

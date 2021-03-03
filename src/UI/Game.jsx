@@ -1,15 +1,51 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
+import { checkGameOver, isChanged, initCells, moveCells, directions, removeAndIncreaseCells, populateField } from '../Controller/Control';
+import { updateField, newField, resetScore, addScore, setSize, setSoundVolume, changeTheme} from '../store/actions';
+import cryptojs from 'crypto-js';
 import styled from 'styled-components';
 import Scoreboard from './Scoreboard';
 import Footer from './Footer';
 import ModalWindow from './ModalWindow';
 import error from '../assets/images/error.png';
+import gameOver from '../assets/images/gameOver.png';
+import check from '../assets/images/check.png';
+import congrats from '../assets/images/congrats.png';
 import axios from 'axios';
+import { connect } from 'react-redux';
+import moveSound from '../assets/audio/move.wav';
 
+var keyPressAllow = true;
+const secret = 'secret';
 class Game extends Component {
   constructor(props) {
     super(props);
-    this.state = {
+    this.state = this.getAllData();
+    this.signIn = this.signIn.bind(this);
+    this.signUp = this.signUp.bind(this);
+    this.signOut = this.signOut.bind(this);
+    this.modal = this.modal.bind(this);
+    this.register = this.register.bind(this);
+    this.login = this.login.bind(this);
+    this.exitModal = this.exitModal.bind(this);
+    this.handleKeyPress = this.handleKeyPress.bind();
+    this.moveSound = new Audio(moveSound);
+  }
+
+  getAllData() {
+    const bestScore = localStorage.getItem("bestScore") ||  0;
+    const mainSettings = localStorage.getItem("s") ? JSON.parse(cryptojs.AES.decrypt(localStorage.getItem("s"), secret).toString(cryptojs.enc.Utf8))
+    : {
+      cells: initCells(4),
+      score: 0,
+      size: 4,
+    };
+    this.props.updateField(mainSettings.cells);
+    this.props.addScore(mainSettings.score);
+    this.props.setSize(mainSettings.size);
+    this.props.setSoundVolume(localStorage.getItem("soundVolume") ||  0.5);
+    return {
+      additionalScore: 0,
+      bestScore,
       modal: {
         active: false,
         data: {
@@ -33,25 +69,19 @@ class Game extends Component {
         }
       }
     }
-    this.signIn = this.signIn.bind(this);
-    this.signUp = this.signUp.bind(this);
-    this.signOut = this.signOut.bind(this);
-    this.modal = this.modal.bind(this);
-    this.register = this.register.bind(this);
-    this.login = this.login.bind(this);
-    this.exitModal = this.exitModal.bind(this);
   }
 
-  componentDidMount() {
-    document.addEventListener('keypress', this.handleKeyPress)
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener('keypress', this.handleKeyPress)
+  saveAllData(state) {
+    const cells = this.props.cells;
+    const score = this.props.score;
+    const size = this.props.size;
+    localStorage.setItem("bestScore", state.bestScore);
+    localStorage.setItem("s", cryptojs.AES.encrypt(JSON.stringify({cells, score, size}), secret).toString());
+    localStorage.setItem("nightmode", this.props.nightmode);
   }
 
   exitModal() {
-    this.props.modalHandler(true);
+    keyPressAllow = true;
     this.setState((state) => state.modal.active = false);
   }
 
@@ -150,7 +180,7 @@ class Game extends Component {
   }
 
   modal(active, type, data) {
-    this.props.modalHandler(false);
+    keyPressAllow = false;
     const {icon, title, description, inputId, firstButton, secondButton, submit, error, exit} = data
 
     this.setState({
@@ -178,9 +208,95 @@ class Game extends Component {
     })
   }
 
+  componentDidMount() {
+    document.addEventListener('keypress', this.handleKeyPress)
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keypress', this.handleKeyPress)
+  }
+
+  handleKeyPress = async event => {
+    const tempCells = this.props.cells;
+
+    if (event.code === "KeyF") {
+      this.props.changeTheme(!this.props.nightmode)
+      this.saveAllData({...this.state})
+    }
+
+    if (event.code === "KeyR") {
+      this.props.newField(this.props.size);
+    }
+
+    if (['KeyA', 'KeyS', 'KeyD', 'KeyW'].includes(event.code) && keyPressAllow) {
+
+      this.setState({additionalScore: null})
+
+      keyPressAllow = false;
+
+      const mapKeyCodeToDirection = {
+        KeyA: directions.LEFT,
+        KeyS: directions.DOWN,
+        KeyD: directions.RIGHT,
+        KeyW: directions.UP,
+      }
+
+      this.props.updateField(moveCells(this.props.cells, mapKeyCodeToDirection[event.code], this.props.size))
+
+      const tempScore = this.props.score;
+
+      this.props.cells.filter(cell => cell.state !== "DYING").forEach((cell) => {
+        if (cell.state === "INCREASE") {
+          this.props.addScore(cell.value*2);
+        }
+      });
+
+      if (this.props.score !== tempScore) {
+        this.setState({additionalScore: this.props.score-tempScore});
+      }
+
+      if(isChanged(tempCells, this.props.cells)) {
+        await delay(100);
+
+        if (this.props.sound) {
+          this.moveSound.play();
+        }
+
+        const cells = removeAndIncreaseCells(this.props.cells);
+
+        this.props.updateField(populateField(cells, this.props.size));
+        this.setState(state => ({
+          ...state,
+          bestScore: this.props.score > this.state.bestScore ? this.props.score : this.state.bestScore
+        }))
+        if(this.props.cells.length === this.props.size**2)
+        {
+          if (checkGameOver(this.props.cells, this.props.size)) {
+            console.log("Game Over")
+          };
+        }
+        this.saveAllData({...this.state});
+      }
+
+      setTimeout(() => keyPressAllow = true, 110)
+    }
+  }
+
+  getNewState() {
+    return {
+      cells: initCells(this.state.size),
+      score: 0,
+      bestScore: localStorage.getItem('bestScore') ? localStorage.getItem('bestScore') : 0
+    };
+  };
+
   render() {
-    const {userdata, nightmode, colors, additionalScore, bestScore, score, cells, size} = this.props;
+    const { userdata, nightmode, color } = this.props;
+    this.moveSound.volume = this.props.soundVolume;
     let cellGrid = [];
+
+    const { bestScore } = this.state;
+    const {cells, size, score} = this.props;
 
     for (let i = 0; i < size**2; i++) {
       cellGrid.push(<Cell key={i}/>);
@@ -188,16 +304,16 @@ class Game extends Component {
     return (
       <MainBlock>
         {this.state.modal.active && <ModalWindow exitHandler={this.exitModal} modaldata={this.state.modal.data}/>}
-        <Scoreboard signout={this.signOut} signin={this.signIn} signup={this.signUp} userdata={userdata} additionalScore={additionalScore} score={score} bestScore={bestScore}/>
+        <Scoreboard signout={this.signOut} signin={this.signIn} signup={this.signUp} userdata={userdata} additionalScore={this.state.additionalScore} score={score} bestScore={bestScore}/>
         <Field size={size}>
           {
             cells.map((value) =>
               {
               let saturation;
               let light;
-              if (colors === 'ON') {
+              if (!color) {
                 saturation = 3;
-                if (nightmode === 'OFF') {
+                if (nightmode) {
                   light = 50+Math.log2(value.value)*5;
                 } else {
                   light = 50-Math.log2(value.value)*5;
@@ -206,7 +322,7 @@ class Game extends Component {
                 saturation = 75-Math.log2(value.value);
                 light = 60;
               }
-              return <Card colors={colors} saturation={saturation} light={light} nightmode={nightmode} size={size} key={value.id} value={value.value} style={{
+              return <Card color={color} saturation={saturation} light={light} size={size} key={value.id} value={value.value} style={{
                 top: `calc(10px + calc(calc(100% - 20px - 10px*${size-1}) / ${size}) * ${value.y} + 10px * ${value.y})`,
                 left:`calc(10px + calc(calc(100% - 20px - 10px*${size-1}) / ${size}) * ${value.x} + 10px * ${value.x})`,
                 backgroundColor: `hsla(${60-20*(Math.log2(value.value))},${saturation}%,${light}%,1)`,
@@ -226,7 +342,7 @@ class Game extends Component {
   }
 }
 
-export default Game;
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 const MainBlock = styled.div`
   display: flex;
@@ -258,7 +374,7 @@ const Cell = styled.div`
 const Card = styled.div`
   position: absolute;
   display: flex;
-  color: ${({colors, saturation, light}) => colors === "OFF" ? `#FBF8F1`: `hsla(60,${saturation}%,${100-light}%,1)`};
+  color: ${({color, saturation, light}) => color ? `#FBF8F1`: `hsla(60,${saturation}%,${100-light}%,1)`};
   justify-content: center;
   align-items: center;
   font-weight: bold;
@@ -280,3 +396,28 @@ const Card = styled.div`
     }
   }
 `;
+
+const mapStateToProps = state => {
+  console.log(state);
+  return {
+    cells: state.cells.value,
+    score: state.score,
+    size: state.size.value,
+    color: state.color.value,
+    nightmode: state.theme.value,
+    sound: state.sound.value,
+    soundVolume: state.sound.volume
+  };
+};
+
+const mapDispatchToProps = {
+  newField,
+  updateField,
+  resetScore,
+  addScore,
+  setSize,
+  changeTheme,
+  setSoundVolume
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Game);

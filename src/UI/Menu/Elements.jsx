@@ -4,6 +4,14 @@ const MenuBlock = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
+  @media (max-width: 940px) {
+    a, &>button {
+      width: 85%;
+    }
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 `;
 
 const SettingsBlock = styled.div`
@@ -12,6 +20,9 @@ const SettingsBlock = styled.div`
   gap: 10px;
   text-transform: uppercase;
   text-align: center;
+  @media (max-width: 940px) {
+    width: 40%;
+  }
 `;
 
 const SettingsTitle = styled.h3`

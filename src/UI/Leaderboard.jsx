@@ -1,14 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components';
 
-const Scores = [
-  ["Egor", 100],
-  ["Jorra", 90],
-  ["Jeka", 80],
-  ["GOGO", 70],
-  ["Max", 60]
-]
-
 export default function Menu({leaderboard}) {
   const [type, settype] = useState("easy");
   return (
@@ -66,6 +58,10 @@ const RightBlock = styled.div`
   display: flex;
   flex-direction: column;
   gap: 40px;
+  @media (max-width: 940px) {
+    min-height: 320px;
+    margin: 20px 0 40px;
+  }
 `;
 
 const TitleBlock = styled.div`
