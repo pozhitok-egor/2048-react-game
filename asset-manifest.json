@@ -1,0 +1,28 @@
+{
+  "files": {
+    "main.css": "/react-game/static/css/main.b496bda8.chunk.css",
+    "main.js": "/react-game/static/js/main.3c6a5684.chunk.js",
+    "main.js.map": "/react-game/static/js/main.3c6a5684.chunk.js.map",
+    "runtime-main.js": "/react-game/static/js/runtime-main.a8de5e2f.js",
+    "runtime-main.js.map": "/react-game/static/js/runtime-main.a8de5e2f.js.map",
+    "static/js/2.7fcd44b6.chunk.js": "/react-game/static/js/2.7fcd44b6.chunk.js",
+    "static/js/2.7fcd44b6.chunk.js.map": "/react-game/static/js/2.7fcd44b6.chunk.js.map",
+    "index.html": "/react-game/index.html",
+    "static/css/main.b496bda8.chunk.css.map": "/react-game/static/css/main.b496bda8.chunk.css.map",
+    "static/js/2.7fcd44b6.chunk.js.LICENSE.txt": "/react-game/static/js/2.7fcd44b6.chunk.js.LICENSE.txt",
+    "static/media/arrow.9cc9a7f7.svg": "/react-game/static/media/arrow.9cc9a7f7.svg",
+    "static/media/congrats.0d39ee7f.png": "/react-game/static/media/congrats.0d39ee7f.png",
+    "static/media/error.b10f224b.png": "/react-game/static/media/error.b10f224b.png",
+    "static/media/github.093111a4.svg": "/react-game/static/media/github.093111a4.svg",
+    "static/media/loader.464a6fda.gif": "/react-game/static/media/loader.464a6fda.gif",
+    "static/media/main theme chill.5d25142f.mp3": "/react-game/static/media/main theme chill.5d25142f.mp3",
+    "static/media/move.d0271a1b.wav": "/react-game/static/media/move.d0271a1b.wav",
+    "static/media/rs_school.5d7a9115.svg": "/react-game/static/media/rs_school.5d7a9115.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.a8de5e2f.js",
+    "static/js/2.7fcd44b6.chunk.js",
+    "static/css/main.b496bda8.chunk.css",
+    "static/js/main.3c6a5684.chunk.js"
+  ]
+}
