@@ -50,7 +50,6 @@ class Settings extends Component {
 }
 
 const mapStateToProps = (state) => {
-  console.log(state)
   return {
     size: state.size.value,
     nightmode: state.theme.value,

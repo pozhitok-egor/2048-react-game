@@ -9,7 +9,6 @@ import backgroundLight from './assets/images/bg-light.png';
 import backgroundDark from './assets/images/bg-night.png';
 import mainTheme from './assets/audio/main theme chill.mp3';
 import Callback from './UI/Callback';
-import axios from 'axios';
 import { connect } from 'react-redux';
 import { changeTheme, fetchUser, fetchLeaderboard } from './store/actions';
 
