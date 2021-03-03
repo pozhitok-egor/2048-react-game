@@ -78,7 +78,7 @@ class App extends Component {
     return (
       <Main nightmode={this.props.nightmode}>
         <BrowserRouter>
-          <Route path='/callback' component={Callback}/>
+          <Route path='react-game/callback' component={Callback}/>
           <Layout>
             <Switch>
               <Menu />
