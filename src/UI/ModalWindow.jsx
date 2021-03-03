@@ -9,7 +9,6 @@ function isFunction(fn) {
 
 const ModalWindow = ({exitHandler, modaldata}) => {
   const {exit, error, type, icon, title, description, inputId, firstButton, secondButton, submit} = modaldata;
-  console.log(modaldata)
 
   const [username, handleUsername] = useState();
   const [password, handlePassword] = useState();
@@ -19,8 +18,8 @@ const ModalWindow = ({exitHandler, modaldata}) => {
     <ReactModal appElement={document.getElementById('root')} isOpen={true} style={ModalStyles}>
       {exit && <Exit type="button" onClick={(e) => exitHandler()}>✖</Exit>}
       {icon && <ModalIcon src={icon} alt='icon'></ModalIcon>}
-      {title && <ModalTitle>{title}</ModalTitle>}
-      {description && <ModalDescription>{description}</ModalDescription>}
+      {title && <ModalTitle type={type}>{title}</ModalTitle>}
+      {description && <ModalDescription type={type}>{description}</ModalDescription>}
       { ((type === "login" || type === "register" || type === 'input') &&
         <form onSubmit={(e) => submit(e, {username, password, confirm})}>
           { type === 'input' &&
@@ -109,13 +108,17 @@ const Error = styled.p`
 `;
 
 const ModalIcon = styled.img`
-  width: 40%;
+  width: 200px;
 `;
 
 const ModalTitle = styled.h2`
+  color: ${({type}) => type === "error" ? "#DB7A7A" : "#7D7171"};
+  margin: 20px;
 `;
 
 const ModalDescription = styled.p`
+  color: ${({type}) => type === "error" ? "#DB7A7A" : "#7D7171"};
+  margin: 0 0 20px;
 `;
 
 const ModalInput = styled.input`

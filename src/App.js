@@ -11,7 +11,7 @@ import mainTheme from './assets/audio/main theme chill.mp3';
 import Callback from './UI/Callback';
 import axios from 'axios';
 import { connect } from 'react-redux';
-import { changeTheme } from './store/actions';
+import { changeTheme, fetchUser } from './store/actions';
 
 class App extends Component {
   constructor(props) {
@@ -30,45 +30,14 @@ class App extends Component {
     this.buttonHandler = this.buttonHandler.bind(this);
     this.musicVolumeHandler = this.musicVolumeHandler.bind(this);
     this.soundVolumeHandler = this.soundVolumeHandler.bind(this);
-    this.userHandler = this.userHandler.bind(this);
     this.mainTheme = new Audio(mainTheme);
     this.mainTheme.loop = true;
   }
 
-  userHandler() {
-    const token = localStorage.getItem('token') || null;
-    if (token) {
-      axios.get('https://twenty-forty-eight.herokuapp.com/user',{
-      headers: {
-        authorization: `Bearer ${token}`,
-        accept: 'application/json'
-      }
-      }).then((res) => {
-        this.setState({user: res.data.user});
-      }).catch((err) => {
-        console.error(err);
-      })
-    } else {
-      this.setState({user: null});
-    }
-  }
-
-
   getAllData() {
     const token = localStorage.getItem('token') || null;
     if (token) {
-      axios.get('https://twenty-forty-eight.herokuapp.com/user',{
-      headers: {
-        authorization: `Bearer ${token}`,
-        accept: 'application/json'
-      }
-      }).then((res) => {
-        this.setState({user: res.data.user});
-      }).catch((err) => {
-        console.error(err);
-      })
-    } else {
-      this.setState({user: null});
+      this.props.fetchUser(token);
     }
     axios.get('https://twenty-forty-eight.herokuapp.com/score',{
     headers: {
@@ -251,7 +220,8 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = {
-  changeTheme
+  changeTheme,
+  fetchUser
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App)

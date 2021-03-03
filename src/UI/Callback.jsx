@@ -1,5 +1,8 @@
 import React from 'react'
 import axios from 'axios';
+import { Redirect } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { fetchUser } from '../store/actions';
 
 const Callback = (props) => {
   var search = props.location.search.substring(1);
@@ -26,11 +29,15 @@ const Callback = (props) => {
       }
     }).then((res) => {
       localStorage.setItem('token', res.data.token);
-      window.document.location = '/';
+      props.fetchUser(res.data.token);
     }).catch((err) => console.log(err.message))
   })
 
-  return <div></div>
+  return <Redirect to="/" />
 }
 
-export default Callback;
+const mapDispatchToProps = {
+  fetchUser
+}
+
+export default connect(null, mapDispatchToProps)(Callback);

@@ -1,4 +1,5 @@
-import { CHANGE_MUSIC, CHANGE_SOUND, CHANGE_THEME, CHANGE_COLOR, NEW_FIELD, SET_SIZE , UPDATE_FIELD, CHANGE_SIZE, INCREMENT, RESET_SCORE, MUSIC_VOLUME, SOUND_VOLUME } from "./types";
+import axios from "axios";
+import { CHANGE_MUSIC, CHANGE_SOUND, CHANGE_THEME, CHANGE_COLOR, NEW_FIELD, SET_SIZE , UPDATE_FIELD, CHANGE_SIZE, INCREMENT, RESET_SCORE, MUSIC_VOLUME, SOUND_VOLUME, FETCH_USERDATA, SIGN_OUT } from "./types";
 
 export function newField(size) {
   return {
@@ -78,7 +79,28 @@ export function changeTheme(state) {
 
 export function changeColor(state) {
   return {
-      type: CHANGE_COLOR,
-      payload: state
+    type: CHANGE_COLOR,
+    payload: state
+  }
+}
+
+export function fetchUser(token) {
+  return async dispatch => {
+    axios.get('https://twenty-forty-eight.herokuapp.com/user',{
+    headers: {
+      authorization: `Bearer ${token}`,
+      accept: 'application/json'
     }
+    }).then((res) => {
+      dispatch({type: FETCH_USERDATA, payload: res.data.user});
+    }).catch((err) => {
+      dispatch({type: FETCH_USERDATA, payload: null});
+    })
+  }
+}
+
+export function signOut() {
+  return {
+    type: SIGN_OUT
+  }
 }

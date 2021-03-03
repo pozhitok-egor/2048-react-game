@@ -1,6 +1,6 @@
 import { combineReducers } from "redux";
 import { initCells } from "../Controller/Control";
-import { CHANGE_MUSIC, CHANGE_SOUND, CHANGE_THEME, CHANGE_COLOR, NEW_FIELD, SET_SIZE , UPDATE_FIELD, CHANGE_SIZE, INCREMENT, RESET_SCORE, MUSIC_VOLUME, SOUND_VOLUME } from "./types";
+import { CHANGE_MUSIC, CHANGE_SOUND, CHANGE_THEME, CHANGE_COLOR, NEW_FIELD, SET_SIZE , UPDATE_FIELD, CHANGE_SIZE, INCREMENT, RESET_SCORE, MUSIC_VOLUME, SOUND_VOLUME, FETCH_USERDATA, SIGN_OUT } from "./types";
 
 
 function cellsReducer( state = { value: initCells(3) }, action ) {
@@ -73,6 +73,15 @@ function soundReducer(state = { value: true, volume: 0.5 }, action) {
   }
 }
 
+function userReducer(state = null, action) {
+  switch (action.type) {
+    case FETCH_USERDATA:
+      return action.payload;
+    case SIGN_OUT:
+      return null;
+    default: return state;
+  }
+}
 
 export const rootReducer = combineReducers({
   cells: cellsReducer,
@@ -82,4 +91,5 @@ export const rootReducer = combineReducers({
   color: colorReducer,
   music: musicReducer,
   sound: soundReducer,
+  user: userReducer
 })

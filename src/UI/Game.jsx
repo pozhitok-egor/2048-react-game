@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { checkGameOver, isChanged, initCells, moveCells, directions, removeAndIncreaseCells, populateField } from '../Controller/Control';
-import { updateField, newField, resetScore, addScore, setSize, setSoundVolume, changeTheme} from '../store/actions';
+import { updateField, newField, resetScore, addScore, setSize, setSoundVolume, changeTheme, fetchUser} from '../store/actions';
 import cryptojs from 'crypto-js';
 import styled from 'styled-components';
 import Scoreboard from './Scoreboard';
@@ -22,7 +22,6 @@ class Game extends Component {
     this.state = this.getAllData();
     this.signIn = this.signIn.bind(this);
     this.signUp = this.signUp.bind(this);
-    this.signOut = this.signOut.bind(this);
     this.modal = this.modal.bind(this);
     this.register = this.register.bind(this);
     this.login = this.login.bind(this);
@@ -83,11 +82,6 @@ class Game extends Component {
   exitModal() {
     keyPressAllow = true;
     this.setState((state) => state.modal.active = false);
-  }
-
-  signOut() {
-    localStorage.removeItem('token');
-    this.props.userHandler();
   }
 
   signIn() {
@@ -154,13 +148,12 @@ class Game extends Component {
     }).then((res) => {
       this.exitModal();
       localStorage.setItem('token', res.data.token);
-      this.props.userHandler();
+      this.props.fetchUser(res.data.token);
     }).catch((err) => this.setState((state) => state.modaldata.error = err.message))
     event.preventDefault();
   }
 
   login(event, data) {
-    console.log(event, data);
     axios.post('https://twenty-forty-eight.herokuapp.com/user/login',
     {
       username: data.username,
@@ -174,7 +167,7 @@ class Game extends Component {
     }).then((res) => {
       this.exitModal();
       localStorage.setItem('token', res.data.token);
-      this.props.userHandler();
+      this.props.fetchUser(res.data.token);
     }).catch((err) => this.setState((state) => state.modaldata.error = err.message))
     event.preventDefault();
   }
@@ -304,7 +297,7 @@ class Game extends Component {
     return (
       <MainBlock>
         {this.state.modal.active && <ModalWindow exitHandler={this.exitModal} modaldata={this.state.modal.data}/>}
-        <Scoreboard signout={this.signOut} signin={this.signIn} signup={this.signUp} userdata={userdata} additionalScore={this.state.additionalScore} score={score} bestScore={bestScore}/>
+        <Scoreboard signin={this.signIn} signup={this.signUp} userdata={userdata} additionalScore={this.state.additionalScore} score={score} bestScore={bestScore}/>
         <Field size={size}>
           {
             cells.map((value) =>
@@ -322,7 +315,7 @@ class Game extends Component {
                 saturation = 75-Math.log2(value.value);
                 light = 60;
               }
-              return <Card color={color} saturation={saturation} light={light} size={size} key={value.id} value={value.value} style={{
+              return <Card colors={color} saturation={saturation} light={light} size={size} key={value.id} value={value.value} style={{
                 top: `calc(10px + calc(calc(100% - 20px - 10px*${size-1}) / ${size}) * ${value.y} + 10px * ${value.y})`,
                 left:`calc(10px + calc(calc(100% - 20px - 10px*${size-1}) / ${size}) * ${value.x} + 10px * ${value.x})`,
                 backgroundColor: `hsla(${60-20*(Math.log2(value.value))},${saturation}%,${light}%,1)`,
@@ -374,7 +367,7 @@ const Cell = styled.div`
 const Card = styled.div`
   position: absolute;
   display: flex;
-  color: ${({color, saturation, light}) => color ? `#FBF8F1`: `hsla(60,${saturation}%,${100-light}%,1)`};
+  color: ${({colors, saturation, light}) => colors ? `#FBF8F1`: `hsla(60,${saturation}%,${100-light}%,1)`};
   justify-content: center;
   align-items: center;
   font-weight: bold;
@@ -398,7 +391,6 @@ const Card = styled.div`
 `;
 
 const mapStateToProps = state => {
-  console.log(state);
   return {
     cells: state.cells.value,
     score: state.score,
@@ -417,7 +409,8 @@ const mapDispatchToProps = {
   addScore,
   setSize,
   changeTheme,
-  setSoundVolume
+  setSoundVolume,
+  fetchUser
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Game);

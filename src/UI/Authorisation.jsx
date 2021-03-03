@@ -1,12 +1,14 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux';
 import styled from 'styled-components';
+import { signOut } from '../store/actions';
 
 
-export default class Authorisation extends Component {
+class Authorisation extends Component {
   render() {
-    const {userdata, signOutHandler, signInHandler, signUpHandler} = this.props;
+    const {userdata, signInHandler, signUpHandler} = this.props;
     if (userdata) {
-      return <Auth><Name>{userdata.username}</Name><Button onClick={() => signOutHandler()}>Sign Out</Button></Auth>;
+      return <Auth><Name>{userdata.username}</Name><Button onClick={() => { localStorage.removeItem("token"); this.props.signOut()}}>Sign Out</Button></Auth>;
     }
     return <Auth><Button onClick={() => signInHandler()}>Sign In</Button><Button onClick={() => signUpHandler()}>Sign Up</Button></Auth>;
   }
@@ -37,3 +39,15 @@ const Button = styled.button`
     color: #EDE3DA;
   }
 `;
+
+const mapStateToProps = (state) => {
+  return {
+    userdata: state.user
+  }
+}
+
+const mapDispatchToProps = {
+  signOut
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Authorisation)

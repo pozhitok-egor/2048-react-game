@@ -10,3 +10,5 @@ export const CHANGE_THEME = 'THEME/CHANGE_THEME';
 export const CHANGE_COLOR = 'COLOR/CHANGE_COLOR';
 export const MUSIC_VOLUME = 'MUSIC/VOLUME';
 export const SOUND_VOLUME = 'SOUND/VOLUME';
+export const FETCH_USERDATA = 'USER/USER_DATA';
+export const SIGN_OUT = 'USER/SIGN_OUT';
