@@ -1,20 +1,24 @@
-import React, { useState } from 'react'
+import React from 'react'
+import { connect } from 'react-redux';
 import styled from 'styled-components';
+import { fetchLeaderboard } from '../store/actions';
+import loaderImage from '../assets/images/loader.gif';
 
-export default function Menu({leaderboard}) {
-  const [type, settype] = useState("easy");
+function Leaderboard(props) {
+  const loader = props.loader.active;
+
   return (
     <RightBlock>
       <TitleBlock>
         <Title>LEADERBOARD</Title>
         <Buttons>
-          <Button onClick={(e) => settype("easy")}>
+          <Button onClick={() => props.fetchLeaderboard("easy")}>
             Easy
           </Button>
-          <Button onClick={(e) => settype("medium")}>
+          <Button onClick={() => props.fetchLeaderboard("medium")}>
             Normal
           </Button>
-          <Button onClick={(e) => settype("hard")}>
+          <Button onClick={() => props.fetchLeaderboard("hard")}>
             Hard
           </Button>
         </Buttons>
@@ -31,8 +35,9 @@ export default function Menu({leaderboard}) {
             Score
           </Score>
         </Row>
-        { leaderboard && leaderboard[type] &&
-          leaderboard[type].map((elem, index) =>
+        { loader && <Loader><img src={loaderImage} alt="loader"/></Loader>}
+        { !loader && props.leaderboard &&
+          props.leaderboard.map((elem, index) =>
             <Row key={index}>
               <Number>
                 # {index+1}
@@ -50,6 +55,21 @@ export default function Menu({leaderboard}) {
     </RightBlock>
   )
 }
+
+const Loader = styled.div`
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+  & img {
+    width: 100px;
+    animation: rotate 4s infinite linear;
+    @keyframes rotate {
+      from {transform: rotate(0deg);}
+      50% {transform: rotate(180deg);}
+      to {transform: rotate(360deg);}
+    }
+  }
+`;
 
 const RightBlock = styled.div`
   font-family: 'Lato', sans-serif;
@@ -125,3 +145,17 @@ const Score = styled.div`
   min-width: 20%;
   text-align: center;
 `;
+
+const mapStateToProps = state => {
+  return {
+    leaderboard: state.leaderboard,
+    loader: state.loader
+  }
+}
+
+const mapDispatchToProps = {
+  fetchLeaderboard
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(Leaderboard)

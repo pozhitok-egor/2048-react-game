@@ -1,6 +1,6 @@
 import { combineReducers } from "redux";
 import { initCells } from "../Controller/Control";
-import { CHANGE_MUSIC, CHANGE_SOUND, CHANGE_THEME, CHANGE_COLOR, NEW_FIELD, SET_SIZE , UPDATE_FIELD, CHANGE_SIZE, INCREMENT, RESET_SCORE, MUSIC_VOLUME, SOUND_VOLUME, FETCH_USERDATA, SIGN_OUT } from "./types";
+import { CHANGE_MUSIC, CHANGE_SOUND, CHANGE_THEME, CHANGE_COLOR, NEW_FIELD, SET_SIZE , UPDATE_FIELD, CHANGE_SIZE, INCREMENT, RESET_SCORE, MUSIC_VOLUME, SOUND_VOLUME, FETCH_USERDATA, SIGN_OUT, FETCH_LEADERBOARD, LOADER_DEACTIVATE, LOADER_ACTIVATE } from "./types";
 
 
 function cellsReducer( state = { value: initCells(3) }, action ) {
@@ -83,6 +83,24 @@ function userReducer(state = null, action) {
   }
 }
 
+function leaderboardReducer(state = null, action) {
+  switch (action.type) {
+    case FETCH_LEADERBOARD:
+      return action.payload;
+    default: return state;
+  }
+}
+
+function loaderReducer(state = { active: false }, action) {
+  switch (action.type) {
+    case LOADER_ACTIVATE:
+      return {...state, active: true}
+    case LOADER_DEACTIVATE:
+      return {...state, active: false}
+    default: return state;
+  }
+}
+
 export const rootReducer = combineReducers({
   cells: cellsReducer,
   score: scoreReducer,
@@ -91,5 +109,7 @@ export const rootReducer = combineReducers({
   color: colorReducer,
   music: musicReducer,
   sound: soundReducer,
-  user: userReducer
+  user: userReducer,
+  leaderboard: leaderboardReducer,
+  loader: loaderReducer
 })

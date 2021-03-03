@@ -1,5 +1,5 @@
 import axios from "axios";
-import { CHANGE_MUSIC, CHANGE_SOUND, CHANGE_THEME, CHANGE_COLOR, NEW_FIELD, SET_SIZE , UPDATE_FIELD, CHANGE_SIZE, INCREMENT, RESET_SCORE, MUSIC_VOLUME, SOUND_VOLUME, FETCH_USERDATA, SIGN_OUT } from "./types";
+import { CHANGE_MUSIC, CHANGE_SOUND, CHANGE_THEME, CHANGE_COLOR, NEW_FIELD, SET_SIZE , UPDATE_FIELD, CHANGE_SIZE, INCREMENT, RESET_SCORE, MUSIC_VOLUME, SOUND_VOLUME, FETCH_USERDATA, SIGN_OUT, FETCH_LEADERBOARD, LOADER_DEACTIVATE, LOADER_ACTIVATE } from "./types";
 
 export function newField(size) {
   return {
@@ -84,6 +84,17 @@ export function changeColor(state) {
   }
 }
 
+export function loaderActivate() {
+  return {
+    type: LOADER_ACTIVATE
+  }
+}
+
+export function loaderDeactivate() {
+  return {
+    type: LOADER_DEACTIVATE
+  }
+}
 export function fetchUser(token) {
   return async dispatch => {
     axios.get('https://twenty-forty-eight.herokuapp.com/user',{
@@ -95,6 +106,24 @@ export function fetchUser(token) {
       dispatch({type: FETCH_USERDATA, payload: res.data.user});
     }).catch((err) => {
       dispatch({type: FETCH_USERDATA, payload: null});
+    })
+  }
+}
+
+export function fetchLeaderboard(type) {
+  return async dispatch => {
+    dispatch(loaderActivate());
+    axios.get('https://twenty-forty-eight.herokuapp.com/score',{
+    headers: {
+      accept: 'application/json'
+    }
+    }).then((res) => {
+      const data = res.data.scores;
+      dispatch({type: FETCH_LEADERBOARD, payload: data.filter(scores => scores.type === type).sort((a, b) => a.score - b.score)})
+      dispatch(loaderDeactivate());
+    }).catch(() => {
+      dispatch({type: FETCH_LEADERBOARD, payload: {}})
+      dispatch(loaderDeactivate());
     })
   }
 }

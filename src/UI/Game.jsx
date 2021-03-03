@@ -8,7 +8,7 @@ import Footer from './Footer';
 import ModalWindow from './ModalWindow';
 import error from '../assets/images/error.png';
 import gameOver from '../assets/images/gameOver.png';
-import check from '../assets/images/check.png';
+// import check from '../assets/images/check.png';
 import congrats from '../assets/images/congrats.png';
 import axios from 'axios';
 import { connect } from 'react-redux';
@@ -26,7 +26,8 @@ class Game extends Component {
     this.register = this.register.bind(this);
     this.login = this.login.bind(this);
     this.exitModal = this.exitModal.bind(this);
-    this.handleKeyPress = this.handleKeyPress.bind();
+    this.handleKeyPress = this.handleKeyPress.bind(this);
+    this.gameOver = this.gameOver.bind(this)
     this.moveSound = new Audio(moveSound);
   }
 
@@ -84,31 +85,31 @@ class Game extends Component {
     this.setState((state) => state.modal.active = false);
   }
 
-  signIn() {
+  signIn(exit) {
     this.modal(true, "login", {
-      exit: true,
+      exit: exit !== undefined ? exit : true,
       firstButton: {
         text: "Login",
         handler: (e) => e.preventDefault()
       },
       secondButton: {
         text: "Register",
-        handler: this.signUp,
+        handler: () => this.signUp(exit),
       },
       submit: this.login
     })
   }
 
-  signUp() {
+  signUp(exit) {
     this.modal(true, "register", {
-      exit: true,
+      exit: exit !== undefined ? exit : true,
       firstButton: {
         text: "Register",
         handler: (e) => e.preventDefault()
       },
       secondButton: {
         text: "Login",
-        handler: this.signIn,
+        handler: () => this.signIn(exit),
       },
       submit: this.register
     })
@@ -149,7 +150,8 @@ class Game extends Component {
       this.exitModal();
       localStorage.setItem('token', res.data.token);
       this.props.fetchUser(res.data.token);
-    }).catch((err) => this.setState((state) => state.modaldata.error = err.message))
+      this.gameOver();
+    }).catch((err) => this.setState((state) => state.modaldata.error = err.message));
     event.preventDefault();
   }
 
@@ -168,7 +170,8 @@ class Game extends Component {
       this.exitModal();
       localStorage.setItem('token', res.data.token);
       this.props.fetchUser(res.data.token);
-    }).catch((err) => this.setState((state) => state.modaldata.error = err.message))
+      this.gameOver();
+    }).catch((err) => this.setState((state) => state.modaldata.error = err.message));
     event.preventDefault();
   }
 
@@ -219,6 +222,7 @@ class Game extends Component {
 
     if (event.code === "KeyR") {
       this.props.newField(this.props.size);
+      this.saveAllData({...this.state});
     }
 
     if (['KeyA', 'KeyS', 'KeyD', 'KeyW'].includes(event.code) && keyPressAllow) {
@@ -262,17 +266,60 @@ class Game extends Component {
           ...state,
           bestScore: this.props.score > this.state.bestScore ? this.props.score : this.state.bestScore
         }))
-        if(this.props.cells.length === this.props.size**2)
-        {
-          if (checkGameOver(this.props.cells, this.props.size)) {
-            console.log("Game Over")
-          };
+        if(this.props.cells && this.props.cells.some(cell => cell.value === 2048) && !this.props.cells.some(cell => cell.value === 4096)) {
+          this.modal(true, "wingame", {
+            exit: true,
+            icon: congrats,
+            title: "You Win!!!",
+            description: `You hit 2048 and won the game!`,
+            firstButton: {
+              text: "OK",
+              handler: (e) => {this.exitModal();}
+            },
+            secondButton: {}
+          });
         }
         this.saveAllData({...this.state});
       }
 
+      if(this.props.cells.length === this.props.size**2)
+      {
+        if (checkGameOver(this.props.cells, this.props.size)) {
+          if (!this.props.user) {
+            this.signIn(false);
+          } else {
+            this.gameOver();
+          }
+        };
+      }
+
       setTimeout(() => keyPressAllow = true, 110)
     }
+  }
+
+  gameOver() {
+    this.modal(true, "gameover", {
+      exit: true,
+      icon: gameOver,
+      title: "Game Over",
+      description: `You scored ${this.props.score}`,
+      firstButton: {
+        text: "OK",
+        handler: (e) => {this.exitModal();
+        this.props.newField(this.props.size);
+        this.saveAllData({...this.state});
+        axios.post("https://twenty-forty-eight.herokuapp.com/score", {
+          type: this.props.size === 3 ? "hard" : this.props.size === 5 ? "easy" : "medium",
+          score: this.props.score
+        }, {
+          headers: {
+            accept: 'application/json',
+            authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });}
+      },
+      secondButton: {}
+    })
   }
 
   getNewState() {
@@ -398,7 +445,8 @@ const mapStateToProps = state => {
     color: state.color.value,
     nightmode: state.theme.value,
     sound: state.sound.value,
-    soundVolume: state.sound.volume
+    soundVolume: state.sound.volume,
+    user: state.user
   };
 };
 

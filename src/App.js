@@ -11,7 +11,7 @@ import mainTheme from './assets/audio/main theme chill.mp3';
 import Callback from './UI/Callback';
 import axios from 'axios';
 import { connect } from 'react-redux';
-import { changeTheme, fetchUser } from './store/actions';
+import { changeTheme, fetchUser, fetchLeaderboard } from './store/actions';
 
 class App extends Component {
   constructor(props) {
@@ -39,21 +39,8 @@ class App extends Component {
     if (token) {
       this.props.fetchUser(token);
     }
-    axios.get('https://twenty-forty-eight.herokuapp.com/score',{
-    headers: {
-      accept: 'application/json'
-    }
-    }).then((res) => {
-      const data = res.data.scores;
-      this.setState({leaderboard: {
-        easy: data.filter(scores => scores.type === "easy").sort((a, b) => a.score - b.score),
-        medium: data.filter(scores => scores.type === "medium").sort((a, b) => a.score - b.score),
-        hard: data.filter(scores => scores.type === "hard").sort((a, b) => a.score - b.score)
-      }});
-    }).catch((err) => {
-      console.error(err);
-    })
     this.props.changeTheme(localStorage.getItem('nightmode') || false)
+    this.props.fetchLeaderboard("easy");
   }
 
   musicVolumeHandler(volume) {
@@ -98,7 +85,7 @@ class App extends Component {
               <Menu />
             </Switch>
             <Game userHandler={this.userHandler} userdata={this.state.user}/>
-            <Leaderboard leaderboard={this.state.leaderboard}/>
+            <Leaderboard />
           </Layout>
         </BrowserRouter>
       </Main>
@@ -221,7 +208,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
   changeTheme,
-  fetchUser
+  fetchUser,
+  fetchLeaderboard
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App)
