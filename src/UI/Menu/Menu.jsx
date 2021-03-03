@@ -26,9 +26,9 @@ class Menu extends Component{
           <Title>2048</Title>
           <Description>Join the numbers and get to the <b>2048 tile</b>!</Description>
         </GameTitle>
-        <Route path='react-game/settings' render={() => <Settings props={this.props} buttonHandler={this.buttonHandler}/>} />
-        <Route path='react-game/sound' render={() => <Sound props={this.props} buttonHandler={this.buttonHandler}/>} />
-        <Route exact path='react-game/' render={() => <Main props={this.props} buttonHandler={this.buttonHandler}/>}/>
+        <Route path='/settings' render={() => <Settings props={this.props} buttonHandler={this.buttonHandler}/>} />
+        <Route path='/sound' render={() => <Sound props={this.props} buttonHandler={this.buttonHandler}/>} />
+        <Route exact path='/' render={() => <Main props={this.props} buttonHandler={this.buttonHandler}/>}/>
       </LeftBlock>
     )
   }
