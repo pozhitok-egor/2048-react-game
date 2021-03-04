@@ -17,7 +17,7 @@ const Callback = (props) => {
   })
   .then((res) => {
     console.log(res);
-    axios.post('https://twenty-forty-eight.herokuapp.com/user/login',
+    axios.post('https://twenty-forty-eight.herokuapp.com/user/register',
     {
       username: res.data.login,
       password: res.data.node_id

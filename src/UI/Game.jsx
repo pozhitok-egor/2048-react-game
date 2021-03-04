@@ -116,42 +116,36 @@ class Game extends Component {
   }
 
   register(event, data) {
-    console.log(event, data);
     if (data.password !== data.confirm) {
-      this.setState((state) => state.modaldata.error = "Passwords don't match");
+      this.setState((state) => state.modal.data.error = "Passwords don't match");
+    } else if (data.username.length < 4) {
+      this.setState((state) => state.modal.data.error = "Your username must be at least 4 characters");
+    } else if (data.username.search(/[a-z]/i) < 0) {
+        this.setState((state) => state.modal.data.error = "Your username must contain at least one letter.");
+    } else if (data.password.length < 6) {
+        this.setState((state) => state.modal.data.error = "Your password must be at least 8 characters");
+    } else if (data.password.search(/[a-z]/i) < 0) {
+        this.setState((state) => state.modal.data.error = "Your password must contain at least one letter.");
+    } else if (data.password.search(/[0-9]/) < 0) {
+        this.setState((state) => state.modal.data.error = "Your password must contain at least one digit.");
+    } else {
+      axios.post('https://twenty-forty-eight.herokuapp.com/user/register',
+      {
+        username: data.username,
+        password: data.password
+      } ,
+      {
+        method: 'post',
+        headers: {
+          accept: 'application/json'
+        }
+      }).then((res) => {
+        this.exitModal();
+        localStorage.setItem('token', res.data.token);
+        this.props.fetchUser(res.data.token);
+        this.gameOver();
+      }).catch((err) => this.setState((state) => state.modal.data.error = err.response.data.message));
     }
-    if (data.username.length < 4) {
-      this.setState((state) => state.modaldata.error = "Your username must be at least 4 characters");
-    }
-    if (data.username.search(/[a-z]/i) < 0) {
-        this.setState((state) => state.modaldata.error = "Your username must contain at least one letter.");
-    }
-
-    if (data.password.length < 6) {
-        this.setState((state) => state.modaldata.error = "Your password must be at least 8 characters");
-    }
-    if (data.password.search(/[a-z]/i) < 0) {
-        this.setState((state) => state.modaldata.error = "Your password must contain at least one letter.");
-    }
-    if (data.password.search(/[0-9]/) < 0) {
-        this.setState((state) => state.modaldata.error = "Your password must contain at least one digit.");
-    }
-    axios.post('https://twenty-forty-eight.herokuapp.com/user/register',
-    {
-      username: data.username,
-      password: data.password
-    } ,
-    {
-      method: 'post',
-      headers: {
-        accept: 'application/json'
-      }
-    }).then((res) => {
-      this.exitModal();
-      localStorage.setItem('token', res.data.token);
-      this.props.fetchUser(res.data.token);
-      this.gameOver();
-    }).catch((err) => this.setState((state) => state.modaldata.error = err.message));
     event.preventDefault();
   }
 
@@ -171,7 +165,7 @@ class Game extends Component {
       localStorage.setItem('token', res.data.token);
       this.props.fetchUser(res.data.token);
       this.gameOver();
-    }).catch((err) => this.setState((state) => state.modaldata.error = err.message));
+    }).catch((err) => this.setState((state) => state.modal.data.error = err.response.data.message));
     event.preventDefault();
   }
 
