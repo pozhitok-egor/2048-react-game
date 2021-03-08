@@ -137,6 +137,9 @@ const Number = styled.div`
 `;
 
 const Name = styled.div`
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
   min-width: 50%;
   text-align: center;
 `;

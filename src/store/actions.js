@@ -119,7 +119,7 @@ export function fetchLeaderboard(type) {
     }
     }).then((res) => {
       const data = res.data.scores;
-      dispatch({type: FETCH_LEADERBOARD, payload: data.filter(scores => scores.type === type).sort((a, b) => a.score - b.score)})
+      dispatch({type: FETCH_LEADERBOARD, payload: data.filter(scores => scores.type === type).sort((a, b) => b.score - a.score)})
       dispatch(loaderDeactivate());
     }).catch(() => {
       dispatch({type: FETCH_LEADERBOARD, payload: {}})

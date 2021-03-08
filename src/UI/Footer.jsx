@@ -14,6 +14,7 @@ export default function Game() {
         <Link href='https://github.com/pozhitok-egor'>
           <img src={icon_github} alt="GitHub"/> pozhitok-egor
         </Link>
+        2021
         <Link href='https://rs.school/js/'>
           <img src={icon_rsschool} alt="The Rolling Scopes School"/>
         </Link>

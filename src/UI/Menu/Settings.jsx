@@ -37,12 +37,12 @@ class Settings extends Component {
 
         <SettingsBlock>
           <SettingsTitle>Colored</SettingsTitle>
-          <SettingsParam><Button onClick={(e) => {localStorage.setItem("colors", !color); this.props.changeTheme(!color)}}>{color ? "OFF" : "ON"}</Button></SettingsParam>
+          <SettingsParam><Button onClick={(e) => {localStorage.setItem("colors", !color); this.props.changeColor(!color)}}>{color ? "OFF" : "ON"}</Button></SettingsParam>
         </SettingsBlock>
 
         <SettingsBlock>
           <SettingsTitle>NightMode</SettingsTitle>
-          <SettingsParam><Button onClick={(e) => {localStorage.setItem("nightmode", !nightmode); this.props.changeColor(!nightmode)}}>{nightmode ? "OFF" : "ON"}</Button></SettingsParam>
+          <SettingsParam><Button onClick={(e) => {localStorage.setItem("nightmode", !nightmode); this.props.changeTheme(!nightmode)}}>{nightmode ? "OFF" : "ON"}</Button></SettingsParam>
         </SettingsBlock>
       </MenuBlock>
     )

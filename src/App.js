@@ -10,7 +10,7 @@ import backgroundDark from './assets/images/bg-night.png';
 import mainTheme from './assets/audio/main theme chill.mp3';
 import Callback from './UI/Callback';
 import { connect } from 'react-redux';
-import { changeTheme, fetchUser, fetchLeaderboard } from './store/actions';
+import { changeTheme, changeMusic, fetchUser, fetchLeaderboard } from './store/actions';
 
 class App extends Component {
   constructor(props) {
@@ -26,7 +26,6 @@ class App extends Component {
 
     this.getAllData();
 
-    this.buttonHandler = this.buttonHandler.bind(this);
     this.musicVolumeHandler = this.musicVolumeHandler.bind(this);
     this.soundVolumeHandler = this.soundVolumeHandler.bind(this);
     this.mainTheme = new Audio(mainTheme);
@@ -38,8 +37,9 @@ class App extends Component {
     if (token) {
       this.props.fetchUser(token);
     }
-    this.props.changeTheme(localStorage.getItem('nightmode') || false)
+    this.props.changeTheme(localStorage.getItem('nightmode') === "true" || false);
     this.props.fetchLeaderboard("easy");
+    this.props.changeMusic(localStorage.getItem('music') === "true" || false);
   }
 
   musicVolumeHandler(volume) {
@@ -51,21 +51,6 @@ class App extends Component {
     this.setState({soundVolume: volume});
     this.moveSound.volume = volume;
     this.saveAllData({...this.state, soundVolume: volume});
-  }
-
-  buttonHandler(param) {
-    switch (param) {
-      case "nightmode":
-        this.saveAllData({...this.state, nightmode: !this.state.nightmode});
-        this.setState({nightmode: !this.state.nightmode});
-        break;
-      case "colors":
-        this.saveAllData({...this.state, colors: !this.state.colors});
-        this.setState({colors: !this.state.colors});
-        break;
-      default:
-        break;
-    }
   }
 
   render() {
@@ -208,7 +193,8 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
   changeTheme,
   fetchUser,
-  fetchLeaderboard
+  fetchLeaderboard,
+  changeMusic
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App)
