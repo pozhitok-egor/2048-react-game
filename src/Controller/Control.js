@@ -1,6 +1,20 @@
 import { cloneDeep } from 'lodash'
 import rotateMatrix from 'rotate-matrix'
-import {uniqueId, maxBy} from 'lodash'
+import { uniqueId, maxBy } from 'lodash'
+
+const DIRECTIONS = {
+  UP: 'UP',
+  DOWN: 'DOWN',
+  LEFT: 'LEFT',
+  RIGHT: 'RIGHT',
+}
+
+const CELLSTATES = {
+  IDLE: "IDLE",
+  MOVING: "MOVING",
+  DYING: "DYING",
+  INCREASE: "INCREASE",
+}
 
 function isChanged(arr1, arr2) {
   return arr1.some((value, index) =>
@@ -8,11 +22,15 @@ function isChanged(arr1, arr2) {
   );
 }
 
+function createMatrix(size) {
+  return Array.from(new Array(size), () =>
+    Array.from(new Array(size), () => 0),
+  );
+}
+
 function checkGameOver(cells, size) {
 
-  const matrix = Array.from(new Array(size), () =>
-    Array.from(new Array(size), () => 0),
-  )
+  const matrix = createMatrix(size);
 
   cells.forEach(cell => {
     matrix[cell.y][cell.x] = cell
@@ -21,10 +39,10 @@ function checkGameOver(cells, size) {
   for (let i = 0; i < matrix.length; i++) {
     const column = matrix[i];
     for (let j = 0; j < column.length; j++) {
-      if(matrix[i+1] && matrix[i+1][j].value === column[j].value) {
+      if (matrix[i + 1] && matrix[i + 1][j].value === column[j].value) {
         return false;
       }
-      if(column[j+1] && column[j+1].value === column[j].value) {
+      if (column[j + 1] && column[j + 1].value === column[j].value) {
         return false;
       }
     }
@@ -39,14 +57,14 @@ function populateField(cells, size) {
     occupiedCoords.add(cell.x * size + cell.y)
   })
 
-  if (occupiedCoords.size === size**2) return
+  if (occupiedCoords.size === size ** 2) return
 
   let x
   let y
-  let startSize = occupiedCoords.size
+  const startSize = occupiedCoords.size
   do {
-    x = Math.floor(Math.random() * (size-1+0.9))
-    y = Math.floor(Math.random() * (size-1+0.9))
+    x = Math.floor(Math.random() * (size - 1 + 0.9))
+    y = Math.floor(Math.random() * (size - 1 + 0.9))
 
     const sum = x * size + y
     occupiedCoords.add(sum)
@@ -61,32 +79,23 @@ function populateField(cells, size) {
   return [...cells, create(x, y, (Math.random() - .2 > 0 ? 2 : 4), id)]
 }
 
-function removeAndIncreaseCells (cells) {
-  return cells.filter(cell => cell.state !== cellStates.DYING).map(cell => {
-    if (cell.state === cellStates.INCREASE) {
+function removeAndIncreaseCells(cells) {
+  return cells.filter(cell => cell.state !== CELLSTATES.DYING).map(cell => {
+    if (cell.state === CELLSTATES.INCREASE) {
       cell.value *= 2
     }
 
-    cell.state = cellStates.IDLE
+    cell.state = CELLSTATES.IDLE
 
     return cell
   })
-}
-
-const directions = {
-  UP: 'UP',
-  DOWN: 'DOWN',
-  LEFT: 'LEFT',
-  RIGHT: 'RIGHT',
 }
 
 const moveCells = (initCells, direction, size) => {
   const cells = cloneDeep(initCells)
 
 
-  let matrix = Array.from(new Array(size), () =>
-    Array.from(new Array(size), () => 0),
-  )
+  let matrix = createMatrix(size);
 
   cells.forEach(cell => {
     matrix[cell.y][cell.x] = cell
@@ -96,8 +105,7 @@ const moveCells = (initCells, direction, size) => {
 
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
-      if (matrix[y][x] === 0) continue
-      moveCell(matrix, x, y)
+      if (matrix[y][x] !== 0) moveCell(matrix, x, y)
     }
   }
 
@@ -128,18 +136,18 @@ function moveCell(matrix, x, y) {
   while (nextRow >= 0) {
     if (matrix[nextRow][x] === 0) {
       matrix[nextRow][x] = matrix[currentRow][x]
-      matrix[currentRow][x].state = cellStates.MOVING
+      matrix[currentRow][x].state = CELLSTATES.MOVING
       matrix[currentRow][x] = 0
 
       currentRow = nextRow
     } else if (
       matrix[nextRow][x].value === matrix[currentRow][x].value &&
-      (matrix[nextRow][x].state === cellStates.IDLE ||
-        matrix[nextRow][x].state === cellStates.MOVING)
+      (matrix[nextRow][x].state === CELLSTATES.IDLE ||
+        matrix[nextRow][x].state === CELLSTATES.MOVING)
     ) {
-      matrix[nextRow][x].state = cellStates.DYING
+      matrix[nextRow][x].state = CELLSTATES.DYING
       matrix[nextRow][x].by = matrix[currentRow][x]
-      matrix[currentRow][x].state = cellStates.INCREASE
+      matrix[currentRow][x].state = CELLSTATES.INCREASE
       matrix[nextRow][x] = matrix[currentRow][x]
       matrix[currentRow][x] = 0
       currentRow = nextRow
@@ -153,14 +161,14 @@ function moveCell(matrix, x, y) {
 
 function rotateMatrixFromDirection(matrix, direction) {
   switch (direction) {
-    case directions.LEFT:
+    case DIRECTIONS.LEFT:
       matrix = rotateMatrix(matrix)
       break
-    case directions.DOWN:
-      matrix = rotateMatrix(matrix,2)
+    case DIRECTIONS.DOWN:
+      matrix = rotateMatrix(matrix, 2)
       break
-    case directions.RIGHT:
-      matrix = rotateMatrix(matrix,3)
+    case DIRECTIONS.RIGHT:
+      matrix = rotateMatrix(matrix, 3)
       break
     default:
       break
@@ -169,13 +177,13 @@ function rotateMatrixFromDirection(matrix, direction) {
 }
 function rotateMatrixToDirection(matrix, direction) {
   switch (direction) {
-    case directions.LEFT:
-      matrix = rotateMatrix(matrix,3)
+    case DIRECTIONS.LEFT:
+      matrix = rotateMatrix(matrix, 3)
       break
-    case directions.DOWN:
-      matrix = rotateMatrix(matrix,2)
+    case DIRECTIONS.DOWN:
+      matrix = rotateMatrix(matrix, 2)
       break
-    case directions.RIGHT:
+    case DIRECTIONS.RIGHT:
       matrix = rotateMatrix(matrix)
       break
     default:
@@ -184,15 +192,8 @@ function rotateMatrixToDirection(matrix, direction) {
   return matrix;
 }
 
-const cellStates = {
-  IDLE: "IDLE",
-  MOVING: "MOVING",
-  DYING: "DYING",
-  INCREASE: "INCREASE",
-}
-
 const create = (x, y, value, id) => ({
-  x, y, value, id: id ? id : uniqueId(), state: cellStates.IDLE
+  x, y, value, id: id ? id : uniqueId(), state: CELLSTATES.IDLE
 })
 
 const initCells = (size) => {
@@ -207,7 +208,7 @@ const initCells = (size) => {
 }
 
 const getRandomCoord = (size) => {
-  return Math.floor(Math.random() * (size-1+0.9))
+  return Math.floor(Math.random() * (size - 1 + 0.9))
 }
 
-export { checkGameOver, isChanged, initCells, moveCells, directions, removeAndIncreaseCells, populateField }
+export { checkGameOver, isChanged, initCells, moveCells, DIRECTIONS, removeAndIncreaseCells, populateField }
