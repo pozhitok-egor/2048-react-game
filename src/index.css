@@ -1,13 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Montserrat:wght@400;700&display=swap');
+
 html,
 body,
 #root {
   height: 100%
 }
 
+html {
+  font-size: 10px;
+}
+
 body {
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.6rem;
   background-color: #faf8ef;
 }
 
@@ -19,4 +26,6 @@ html {
 *::before,
 *::after {
   box-sizing: inherit;
+  margin: 0;
+  padding: 0;
 }

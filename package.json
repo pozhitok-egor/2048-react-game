@@ -4,16 +4,22 @@
   "private": true,
   "homepage": "https://pozhitok-egor-2048.netlify.app",
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-brands-svg-icons": "^5.15.4",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@fortawesome/react-fontawesome": "^0.1.16",
     "@material-ui/core": "^4.11.3",
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.7.3",
+    "@types/jest": "^27.4.0",
+    "@types/node": "^17.0.8",
+    "@types/react": "^17.0.38",
+    "@types/react-dom": "^17.0.11",
     "axios": "^0.21.1",
-    "crypto-js": "^4.0.0",
     "lodash": "^4.17.21",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "react-modal": "^3.12.1",
     "react-redux": "^7.2.2",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
@@ -22,10 +28,11 @@
     "redux-thunk": "^2.3.0",
     "rotate-matrix": "0.0.3",
     "styled-components": "^5.2.1",
+    "typescript": "^4.5.4",
     "web-vitals": "^1.1.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "react-scripts --openssl-legacy-provider start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -47,5 +54,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/react-router-dom": "^5.3.2",
+    "@types/styled-components": "^5.1.20"
   }
 }
