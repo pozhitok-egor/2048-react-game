@@ -2,6 +2,7 @@ import styled from "styled-components";
 import ICell from "../../interfaces/ICell";
 
 export const GameField = styled.div<{size: number}>`
+  user-select: none;
   position: relative;
   aspect-ratio: 1;
   display: grid;
@@ -35,7 +36,6 @@ export const Card = styled.div<{
   size: number;
   cell: ICell;
 }>`
-  user-select: none;
   position: absolute;
   display: flex;
   color: ${({colors, saturation, light}) =>

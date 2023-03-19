@@ -11,7 +11,6 @@ export const MenuBlock = styled.div<{menuState: boolean; nightmode: boolean}>`
   }
 
   @media (max-width: 767px) {
-    padding: 2rem;
     position: ${({menuState}) => (menuState ? "fixed" : "relative")};
     top: 0;
     left: 0;
@@ -30,7 +29,7 @@ export const MenuBlock = styled.div<{menuState: boolean; nightmode: boolean}>`
 
 export const Header = styled.div`
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
 `;
 
@@ -38,6 +37,10 @@ export const Logo = styled.div`
   display: flex;
   flex-direction: column;
   text-align: center;
+  font-size: 1.4rem;
+  @media (max-width: 576px) {
+    width: 17rem;
+  }
 `;
 
 export const BurgerButton = styled.div`
@@ -57,10 +60,10 @@ export const Items = styled.div<{menuState: boolean}>`
 `;
 
 export const LogoText = styled.p`
-  font-size: 4.8rem;
+  font-size: 6.4rem;
   font-weight: bold;
   font-family: "Lato";
-  @media (min-width: 576px) {
+  @media (max-width: 576px) {
     font-size: 7.2rem;
   }
 `;

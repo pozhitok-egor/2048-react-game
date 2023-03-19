@@ -98,15 +98,12 @@ export const Main = styled.div<{nightmode: boolean}>`
 
 export const Layout = styled.div`
   display: grid;
-  gap: 20px;
   height: 100%;
   padding: 20px;
   grid-template-columns: 1fr;
+  gap: 20px;
   @media (min-width: 576px) {
     padding: 40px;
-  }
-  @media (min-width: 768px) {
-    grid-template-columns: 1fr auto 1fr;
   }
   @media (min-width: 992px) {
     padding: 40px 10%;

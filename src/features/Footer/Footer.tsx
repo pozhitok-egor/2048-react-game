@@ -1,15 +1,15 @@
 import {faGithub} from "@fortawesome/free-brands-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import icon_rsschool from "../../assets/images/rs_school.svg";
-import {Contacts, FooterBlock, Link, Text} from "./Footer.styled";
+import {Contacts, FooterBlock, InfoText, KeysText, Link} from "./Footer.styled";
 
 const Footer = () => {
   return (
     <FooterBlock>
-      <Text>
-        <b>HOW TO PLAY:</b> Use your <b>arrow keys</b> to move the tiles. When
-        towo tiles with the same number touch, they <b>merge into one</b>!
-      </Text>
+      <InfoText>
+        <b>HOW TO PLAY:</b> You need to move the tiles. When
+        two tiles with the same number touch, they <b>merge into one</b>!
+      </InfoText>
       <Contacts>
         <Link href="https://github.com/pozhitok-egor">
           <FontAwesomeIcon icon={faGithub} /> pozhitok-egor
@@ -19,9 +19,9 @@ const Footer = () => {
           <img src={icon_rsschool} alt="The Rolling Scopes School" />
         </Link>
       </Contacts>
-      <Text>
-        <b>R</b> Restart | <b>F</b> Nightmode | <b>WASD</b> move
-      </Text>
+      <KeysText>
+        <b>R</b> Restart | <b>F</b> Nightmode | <b>WASD & Arrows - </b> move
+      </KeysText>
     </FooterBlock>
   );
 };

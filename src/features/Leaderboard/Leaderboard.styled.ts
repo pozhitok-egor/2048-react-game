@@ -21,3 +21,10 @@ export const Table = styled.table`
     font-weight: bold;
   }
 `;
+
+export const MainBlock = styled.div`
+  width: auto;
+  @media (max-width: 991px) {
+    display: none;
+  }
+`

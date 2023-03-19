@@ -1,0 +1,8 @@
+export enum DIRECTIONS {
+  UP = 'UP',
+  DOWN = 'DOWN',
+  LEFT = 'LEFT',
+  RIGHT = 'RIGHT',
+}
+
+export type Directions = DIRECTIONS.UP | DIRECTIONS.DOWN | DIRECTIONS.LEFT | DIRECTIONS.RIGHT;

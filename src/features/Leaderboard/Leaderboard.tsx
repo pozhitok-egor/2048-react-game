@@ -1,10 +1,10 @@
-import {Table} from "./Leaderboard.styled";
+import {MainBlock, Table} from "./Leaderboard.styled";
 
 const Leaderboard = () => {
   // TODO: Replace with redux store data
 
   return (
-    <div style={{width: "auto"}}>
+    <MainBlock>
       <h4 style={{textAlign: "center", margin: "2rem 0"}}>
         Difficulty: Medium
       </h4>
@@ -24,7 +24,7 @@ const Leaderboard = () => {
           </tr>
         </tbody>
       </Table>
-    </div>
+    </MainBlock>
   );
 };
 

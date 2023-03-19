@@ -28,6 +28,9 @@ export const Score = styled.div`
 export const ScoreTitle = styled.p`
   text-align: center;
   font-size: 1.4rem;
+  @media (max-width: 575px) {
+    font-size: 1.2rem;
+  }
 `;
 
 export const AdditionalScore = styled.div`
@@ -58,4 +61,7 @@ export const AdditionalScore = styled.div`
 export const ScoreValue = styled.p`
   font-weight: bold;
   font-size: 1.8rem;
+  @media (min-width: 576px) and (max-width: 991px) {
+    font-size: 2.4rem;
+  }
 `;
